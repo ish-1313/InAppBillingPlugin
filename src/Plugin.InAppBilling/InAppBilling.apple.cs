@@ -109,7 +109,8 @@ namespace Plugin.InAppBilling
 					validPurchases.Add(purchase);
 			}
 
-			return validPurchases.Any() ? validPurchases : null;
+			//return validPurchases.Any() ? validPurchases : null;
+			return validPurchases;
 		}
 
 
@@ -137,7 +138,13 @@ namespace Plugin.InAppBilling
 				else
 				{
 					allTransactions.AddRange(transactions);
-					tcsTransaction.TrySetResult(allTransactions.ToArray());
+
+					// ish: return empty array to distinguish no purchases from crashes 
+					var result = allTransactions.ToArray();
+					if (result == null) result = new SKPaymentTransaction[0];
+
+					//tcsTransaction.TrySetResult(allTransactions.ToArray());
+					tcsTransaction.TrySetResult(result);
 				}
 			});
 
