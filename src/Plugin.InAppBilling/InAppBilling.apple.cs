@@ -94,19 +94,18 @@ namespace Plugin.InAppBilling
 			var purchases = await RestoreAsync();
 			var validPurchases = new List<InAppBillingPurchase>();
 
-			if (purchases != null)
-			{
-				var comparer = new InAppBillingPurchaseComparer();
-				var converted = purchases
-					.Where(p => p != null)
-					.Select(p2 => p2.ToIABPurchase())
-					.Distinct(comparer);
+			if ((purchases?.Count() ?? 0) < 1) return (validPurchases);
 
-				foreach (var purchase in converted)
-				{
-					if ((verifyOnlyProductId != null && !verifyOnlyProductId.Equals(purchase.ProductId)) || await ValidateReceipt(verifyPurchase, purchase.ProductId, purchase.Id))
-						validPurchases.Add(purchase);
-				}
+			var comparer = new InAppBillingPurchaseComparer();
+			var converted = purchases
+				.Where(p => p != null)
+				.Select(p2 => p2.ToIABPurchase())
+				.Distinct(comparer);
+
+			foreach (var purchase in converted)
+			{
+				if ((verifyOnlyProductId != null && !verifyOnlyProductId.Equals(purchase.ProductId)) || await ValidateReceipt(verifyPurchase, purchase.ProductId, purchase.Id))
+					validPurchases.Add(purchase);
 			}
 			return validPurchases;
 		}
