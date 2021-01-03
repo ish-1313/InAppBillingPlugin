@@ -1,6 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard1.0;netstandard2.0;MonoAndroid90;Xamarin.iOS10;Xamarin.TVOS10;uap10.0.16299</TargetFrameworks>
+		<TargetFrameworks>netstandard1.0;netstandard2.0;MonoAndroid90;Xamarin.iOS10;Xamarin.TVOS10</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)'=='Windows_NT'">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
 		<AssemblyName>Plugin.InAppBilling</AssemblyName>
 		<RootNamespace>Plugin.InAppBilling</RootNamespace>
 		<Product>$(AssemblyName) ($(TargetFramework))</Product>
