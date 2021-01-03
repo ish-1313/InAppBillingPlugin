@@ -92,24 +92,22 @@ namespace Plugin.InAppBilling
 		protected async override Task<IEnumerable<InAppBillingPurchase>> GetPurchasesAsync(ItemType itemType, IInAppBillingVerifyPurchase verifyPurchase, string verifyOnlyProductId)
 		{
 			var purchases = await RestoreAsync();
-
-			if (purchases == null)
-				return null;
-
-			var comparer = new InAppBillingPurchaseComparer();
-			var converted = purchases
-				.Where(p => p != null)
-				.Select(p2 => p2.ToIABPurchase())
-				.Distinct(comparer);
-
 			var validPurchases = new List<InAppBillingPurchase>();
-			foreach (var purchase in converted)
-			{
-				if ((verifyOnlyProductId != null && !verifyOnlyProductId.Equals(purchase.ProductId)) || await ValidateReceipt(verifyPurchase, purchase.ProductId, purchase.Id))
-					validPurchases.Add(purchase);
-			}
 
-			//return validPurchases.Any() ? validPurchases : null;
+			if (purchases != null)
+			{
+				var comparer = new InAppBillingPurchaseComparer();
+				var converted = purchases
+					.Where(p => p != null)
+					.Select(p2 => p2.ToIABPurchase())
+					.Distinct(comparer);
+
+				foreach (var purchase in converted)
+				{
+					if ((verifyOnlyProductId != null && !verifyOnlyProductId.Equals(purchase.ProductId)) || await ValidateReceipt(verifyPurchase, purchase.ProductId, purchase.Id))
+						validPurchases.Add(purchase);
+				}
+			}
 			return validPurchases;
 		}
 
@@ -138,13 +136,7 @@ namespace Plugin.InAppBilling
 				else
 				{
 					allTransactions.AddRange(transactions);
-
-					// ish: return empty array to distinguish no purchases from crashes 
-					var result = allTransactions.ToArray();
-					if (result == null) result = new SKPaymentTransaction[0];
-
-					//tcsTransaction.TrySetResult(allTransactions.ToArray());
-					tcsTransaction.TrySetResult(result);
+					tcsTransaction.TrySetResult(allTransactions.ToArray());
 				}
 			});
 
